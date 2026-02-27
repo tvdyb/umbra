@@ -43,7 +43,7 @@ public class UmbraController {
             return ResponseEntity.ok(repo.getOrderBook());
         } catch (Exception e) {
             logger.error("Failed to get orderbook", e);
-            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.internalServerError().body(Map.<String, Object>of("error", e.getMessage()));
         }
     }
 
@@ -85,11 +85,11 @@ public class UmbraController {
                     ))).exceptionally(e -> {
                         logger.error("Failed to create order", e);
                         return ResponseEntity.internalServerError()
-                                .body(Map.of("error", e.getMessage()));
+                                .body(Map.<String, Object>of("error", e.getMessage()));
                     });
                 })
                 .orElse(CompletableFuture.completedFuture(
-                        ResponseEntity.badRequest().body(Map.of("error", "DarkPoolOperator not found"))
+                        ResponseEntity.badRequest().body(Map.<String, Object>of("error", "DarkPoolOperator not found"))
                 ));
     }
 
@@ -115,7 +115,7 @@ public class UmbraController {
         ))).exceptionally(e -> {
             logger.error("Failed to cancel order", e);
             return ResponseEntity.internalServerError()
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.<String, Object>of("error", e.getMessage()));
         });
     }
 
@@ -159,10 +159,10 @@ public class UmbraController {
                         stats.put("accumulatedIndex", payload.get("accumulatedIndex"));
                         return ResponseEntity.ok(stats);
                     })
-                    .orElse(ResponseEntity.ok(Map.of("error", "No lending pool found")));
+                    .orElse(ResponseEntity.ok(Map.<String, Object>of("error", "No lending pool found")));
         } catch (Exception e) {
             logger.error("Failed to get pool", e);
-            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.internalServerError().body(Map.<String, Object>of("error", e.getMessage()));
         }
     }
 
@@ -194,11 +194,11 @@ public class UmbraController {
                     ))).exceptionally(e -> {
                         logger.error("Supply failed", e);
                         return ResponseEntity.internalServerError()
-                                .body(Map.of("error", e.getMessage()));
+                                .body(Map.<String, Object>of("error", e.getMessage()));
                     });
                 })
                 .orElse(CompletableFuture.completedFuture(
-                        ResponseEntity.badRequest().body(Map.of("error", "LendingPool not found"))
+                        ResponseEntity.badRequest().body(Map.<String, Object>of("error", "LendingPool not found"))
                 ));
     }
 
@@ -236,11 +236,11 @@ public class UmbraController {
                     ))).exceptionally(e -> {
                         logger.error("Borrow failed", e);
                         return ResponseEntity.internalServerError()
-                                .body(Map.of("error", e.getMessage()));
+                                .body(Map.<String, Object>of("error", e.getMessage()));
                     });
                 })
                 .orElse(CompletableFuture.completedFuture(
-                        ResponseEntity.badRequest().body(Map.of("error", "LendingPool not found"))
+                        ResponseEntity.badRequest().body(Map.<String, Object>of("error", "LendingPool not found"))
                 ));
     }
 
@@ -270,7 +270,7 @@ public class UmbraController {
         ))).exceptionally(e -> {
             logger.error("Repay failed", e);
             return ResponseEntity.internalServerError()
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.<String, Object>of("error", e.getMessage()));
         });
     }
 
@@ -286,7 +286,7 @@ public class UmbraController {
             ));
         } catch (Exception e) {
             logger.error("Failed to get positions", e);
-            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.internalServerError().body(Map.<String, Object>of("error", e.getMessage()));
         }
     }
 
