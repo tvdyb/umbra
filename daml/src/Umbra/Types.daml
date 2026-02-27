@@ -1,0 +1,42 @@
+module Umbra.Types where
+
+-- Asset identifiers
+data Asset = CC | USDCx
+  deriving (Eq, Show, Ord)
+
+-- Order side for dark pool
+data Side = Buy | Sell
+  deriving (Eq, Show, Ord)
+
+-- Order status
+data OrderStatus = Open | Filled | Cancelled | PartiallyFilled
+  deriving (Eq, Show, Ord)
+
+-- Price as a decimal (CC per USDCx)
+type Price = Decimal
+
+-- Quantity as a decimal
+type Quantity = Decimal
+
+-- Unique order identifier
+type OrderId = Text
+
+-- Unique position identifier
+type PositionId = Text
+
+-- Interest rate model parameters
+data RateModelParams = RateModelParams
+  with
+    baseRate : Decimal
+    multiplierPerUtil : Decimal
+    kinkUtilization : Decimal
+    jumpMultiplier : Decimal
+  deriving (Eq, Show)
+
+-- Default rate model (similar to Aave's)
+defaultRateModel : RateModelParams
+defaultRateModel = RateModelParams with
+  baseRate = 0.02
+  multiplierPerUtil = 0.10
+  kinkUtilization = 0.80
+  jumpMultiplier = 0.75

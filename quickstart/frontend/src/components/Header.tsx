@@ -60,6 +60,12 @@ const AuthenticatedLinks: React.FC = () => {
             <li className="nav-item">
                 <Link className="nav-link" to="/licenses">Licenses</Link>
             </li>
+            <li className="nav-item">
+                <Link className="nav-link" to="/trade">Trade</Link>
+            </li>
+            <li className="nav-item">
+                <Link className="nav-link" to="/lend">Lend</Link>
+            </li>
             {user.isAdmin && (
                 <li className="nav-item">
                     <Link className="nav-link" to="/tenants">Tenants</Link>

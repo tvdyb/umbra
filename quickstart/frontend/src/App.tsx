@@ -13,6 +13,8 @@ import Header from './components/Header';
 import ToastNotification from './components/ToastNotification';
 import AppInstallsView from "./views/AppInstallsView.tsx";
 import LicensesView from './views/LicensesView';
+import TradePage from './pages/TradePage';
+import LendPage from './pages/LendPage';
 import { LicenseProvider } from './stores/licenseStore';
 import { AppInstallProvider } from "./stores/appInstallStore.tsx";
 import { TenantRegistrationProvider } from "./stores/tenantRegistrationStore.tsx";
@@ -36,6 +38,8 @@ const App: React.FC = () => {
                     <Route path="/login" element={<LoginView />} />
                     <Route path="/app-installs" element={<AppInstallsView />} />
                     <Route path="/licenses" element={<LicensesView />} />
+                    <Route path="/trade" element={<TradePage />} />
+                    <Route path="/lend" element={<LendPage />} />
                 </Routes>
             </main>
             <ToastNotification />

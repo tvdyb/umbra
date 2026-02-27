@@ -1,5 +1,6 @@
 import {ConfigEnv, defineConfig, Plugin, loadEnv} from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import ViteYaml from '@modyfi/vite-plugin-yaml'
 
 
@@ -42,6 +43,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     return {
         plugins: [
             react(),
+            tailwindcss(),
             ViteYaml(),
             printWelcomeMessage()
         ],

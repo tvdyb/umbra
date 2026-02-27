@@ -1,6 +1,19 @@
 /* Copyright (c) 2026, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved. */
 /* SPDX-License-Identifier: 0BSD */
 
+@import "tailwindcss";
+
+@theme {
+  --color-umbra-bg: #0a0e1a;
+  --color-umbra-card: #111827;
+  --color-umbra-border: #1e293b;
+  --color-umbra-purple: #7c3aed;
+  --color-umbra-green: #22c55e;
+  --color-umbra-red: #ef4444;
+  --color-umbra-text: #e2e8f0;
+  --color-umbra-muted: #94a3b8;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
