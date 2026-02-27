@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y curl && \
     npm --version && node --version
 
 # Install DAML SDK 3.4.10
-RUN curl -fsSL https://github.com/digital-asset/daml/releases/download/v3.4.10/daml-sdk-3.4.10-linux-x86_64.tar.gz \
+RUN curl -fSL --retry 5 --retry-delay 10 --retry-max-time 600 \
+      https://github.com/digital-asset/daml/releases/download/v3.4.10/daml-sdk-3.4.10-linux-x86_64.tar.gz \
       -o /tmp/daml-sdk.tar.gz && \
     mkdir -p /tmp/daml-sdk && \
     tar xzf /tmp/daml-sdk.tar.gz -C /tmp/daml-sdk --strip-components=1 && \
