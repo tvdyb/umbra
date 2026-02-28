@@ -79,7 +79,7 @@ public class UmbraController {
                             "CreateOrder",
                             choiceArg,
                             List.of(config.getOperatorParty(), trader)
-                    ).thenApply(tx -> ResponseEntity.ok(Map.of(
+                    ).thenApply(tx -> ResponseEntity.ok(Map.<String, Object>of(
                             "status", "created",
                             "transactionId", tx.getUpdateId()
                     ))).exceptionally(e -> {
@@ -109,7 +109,7 @@ public class UmbraController {
                 "CancelOrder",
                 choiceArg,
                 trader
-        ).thenApply(tx -> ResponseEntity.ok(Map.of(
+        ).thenApply(tx -> ResponseEntity.ok(Map.<String, Object>of(
                 "status", "cancelled",
                 "transactionId", tx.getUpdateId()
         ))).exceptionally(e -> {
@@ -188,7 +188,7 @@ public class UmbraController {
                             "Supply",
                             choiceArg,
                             List.of(config.getOperatorParty(), supplier)
-                    ).thenApply(tx -> ResponseEntity.ok(Map.of(
+                    ).thenApply(tx -> ResponseEntity.ok(Map.<String, Object>of(
                             "status", "supplied",
                             "transactionId", tx.getUpdateId()
                     ))).exceptionally(e -> {
@@ -230,7 +230,7 @@ public class UmbraController {
                             "Borrow",
                             choiceArg,
                             List.of(config.getOperatorParty(), borrower)
-                    ).thenApply(tx -> ResponseEntity.ok(Map.of(
+                    ).thenApply(tx -> ResponseEntity.ok(Map.<String, Object>of(
                             "status", "borrowed",
                             "transactionId", tx.getUpdateId()
                     ))).exceptionally(e -> {
@@ -264,7 +264,7 @@ public class UmbraController {
                 "Repay",
                 choiceArg,
                 borrower
-        ).thenApply(tx -> ResponseEntity.ok(Map.of(
+        ).thenApply(tx -> ResponseEntity.ok(Map.<String, Object>of(
                 "status", "repaid",
                 "transactionId", tx.getUpdateId()
         ))).exceptionally(e -> {
@@ -280,7 +280,7 @@ public class UmbraController {
     @GetMapping("/positions/{trader}")
     public ResponseEntity<Map<String, Object>> getPositions(@PathVariable String trader) {
         try {
-            return ResponseEntity.ok(Map.of(
+            return ResponseEntity.ok(Map.<String, Object>of(
                     "supply", repo.getSupplyPositions(trader),
                     "borrow", repo.getBorrowPositions(trader)
             ));

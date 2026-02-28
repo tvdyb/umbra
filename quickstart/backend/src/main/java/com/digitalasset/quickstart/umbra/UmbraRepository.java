@@ -71,13 +71,13 @@ public class UmbraRepository {
         }
 
         for (var e : buyAgg.entrySet()) {
-            buys.add(Map.of("price", Double.parseDouble(e.getKey()), "quantity", e.getValue()));
+            buys.add(Map.<String, Object>of("price", Double.parseDouble(e.getKey()), "quantity", e.getValue()));
         }
         for (var e : sellAgg.entrySet()) {
-            sells.add(Map.of("price", Double.parseDouble(e.getKey()), "quantity", e.getValue()));
+            sells.add(Map.<String, Object>of("price", Double.parseDouble(e.getKey()), "quantity", e.getValue()));
         }
 
-        return Map.of("buys", buys, "sells", sells);
+        return Map.<String, Object>of("buys", buys, "sells", sells);
     }
 
     /**

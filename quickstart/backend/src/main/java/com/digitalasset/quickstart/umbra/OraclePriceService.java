@@ -47,8 +47,7 @@ public class OraclePriceService {
             }
 
             String contractId = (String) ccOracle.get().get("contractId");
-            double newPrice = BASE_PRICE + ThreadLocalRandom.current().nextDouble(-PRICE_VARIANCE, PRICE_VARIANCE);
-            newPrice = Math.round(newPrice * 10000.0) / 10000.0; // 4 decimal places
+            final double newPrice = Math.round((BASE_PRICE + ThreadLocalRandom.current().nextDouble(-PRICE_VARIANCE, PRICE_VARIANCE)) * 10000.0) / 10000.0;
 
             ValueOuterClass.Value choiceArg = recordVal(
                     field("newPrice", numericVal(newPrice))
