@@ -99,8 +99,12 @@ const TenantRegistrationView: React.FC = () => {
     }
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
+        <section className="page-section">
+            <div className="page-head">
+                <h1 className="page-title">Tenant Registrations</h1>
+                <p className="page-subtitle">Register additional tenants and map party/auth settings.</p>
+            </div>
+            <form onSubmit={handleSubmit} className="panel mb-3">
                 <div className="mb-3">
                     <label htmlFor="tenantId" className="form-label">
                         Tenant ID:
@@ -194,9 +198,10 @@ const TenantRegistrationView: React.FC = () => {
                 </button>
             </form>
 
-            <div className="mt-4">
+            <div className="panel">
                 <h3>Existing Tenant Registrations</h3>
-                <table className="table nowrap">
+                <div className="table-responsive">
+                <table className="table table-modern nowrap">
                     <thead>
                         <tr>
                             <th>Tenant ID</th>
@@ -238,8 +243,9 @@ const TenantRegistrationView: React.FC = () => {
                         ))}
                     </tbody>
                 </table>
+                </div>
             </div>
-        </div>
+        </section>
     )
 }
 

@@ -2,113 +2,63 @@
 // SPDX-License-Identifier: 0BSD
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useUserStore } from '../stores/userStore';
 
 const Header: React.FC = () => {
+    const { user, loading, fetchUser, logout } = useUserStore();
+
+    React.useEffect(() => {
+        void fetchUser();
+    }, [fetchUser]);
+
     return (
-        <header>
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                <div className="container-fluid">
-                    <a className="navbar-brand" href="#">
-                        Canton Network Quickstart
-                    </a>
-                    <div>
-                        <button
-                            className="navbar-toggler"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#navbarNav"
-                            aria-controls="navbarNav"
-                            aria-expanded="false"
-                            aria-label="Toggle navigation"
-                        >
-                            <span className="navbar-toggler-icon"></span>
-                        </button>
-                    </div>
-                    <div className="collapse navbar-collapse" id="navbarNav">
-                        <AuthenticatedLinks />
-                    </div>
+        <header className="app-header">
+            <div className="app-header-inner">
+                <div className="brand-wrap">
+                    <Link to="/" className="brand-link">
+                        <span className="brand-dot" />
+                        <span className="brand-text">Canton Network Quickstart</span>
+                    </Link>
                 </div>
-                <div>
-                    <UserSection />
+                <nav className="nav-tabs-main" aria-label="Main Navigation">
+                    <NavTab to="/">Home</NavTab>
+                    <NavTab to="/app-installs">App Installs</NavTab>
+                    <NavTab to="/licenses">Licenses</NavTab>
+                    <NavTab to="/trade">Trade</NavTab>
+                    <NavTab to="/lend">Lend</NavTab>
+                    <NavTab to="/debug">Debug</NavTab>
+                    {user?.isAdmin && <NavTab to="/tenants">Tenants</NavTab>}
+                </nav>
+                <div className="user-panel">
+                    {loading ? (
+                        <span className="text-muted small">Loading user…</span>
+                    ) : user ? (
+                        <>
+                            <div className="user-chip">
+                                <div className="user-name">{user.name}</div>
+                                <div className="user-party">{user.party}</div>
+                            </div>
+                            <button className="btn btn-outline-secondary btn-sm" onClick={() => void logout()}>
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <Link className="btn btn-primary btn-sm" to="/login">Login</Link>
+                    )}
                 </div>
-            </nav>
+            </div>
         </header>
     );
 };
 
-const AuthenticatedLinks: React.FC = () => {
-    const { user, loading, fetchUser } = useUserStore();
-
-    React.useEffect(() => {
-        fetchUser();
-    }, [fetchUser]);
-
-    if (loading || user === null) {
-        return null;
-    }
-
-    return (
-        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-                <Link className="nav-link" to="/">Home</Link>
-            </li>
-            <li className="nav-item">
-                <Link className="nav-link" to="/app-installs">AppInstalls</Link>
-            </li>
-            <li className="nav-item">
-                <Link className="nav-link" to="/licenses">Licenses</Link>
-            </li>
-            <li className="nav-item">
-                <Link className="nav-link" to="/trade">Trade</Link>
-            </li>
-            <li className="nav-item">
-                <Link className="nav-link" to="/lend">Lend</Link>
-            </li>
-            {user.isAdmin && (
-                <li className="nav-item">
-                    <Link className="nav-link" to="/tenants">Tenants</Link>
-                </li>
-            )}
-        </ul>
-    );
-};
-
-const UserSection: React.FC = () => {
-    const { user, loading, fetchUser, logout } = useUserStore();
-
-    React.useEffect(() => {
-        fetchUser();
-    }, [fetchUser]);
-
-    if (loading) return <div className="ms-auto">Loading...</div>;
-
-
-    if (user === null) {
-        return (
-            <ul className="navbar-nav ms-auto">
-                <li className="nav-item">
-                    <Link className="nav-link" to="/login">Login</Link>
-                </li>
-            </ul>
-        );
-    }
-
-    return (
-        <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-                <span className="nav-link fw-bold" id="user-name">
-                    {user.name}
-                </span>
-            </li>
-            <li className="nav-item">
-                <button className="nav-link btn btn-link" onClick={logout}>
-                    Logout
-                </button>
-            </li>
-        </ul>
-    );
-};
+const NavTab: React.FC<{ to: string; children: React.ReactNode }> = ({ to, children }) => (
+    <NavLink
+        to={to}
+        className={({ isActive }) => `nav-tab ${isActive ? 'active' : ''}`}
+    >
+        {children}
+    </NavLink>
+);
 
 export default Header;

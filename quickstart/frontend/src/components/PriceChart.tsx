@@ -1,26 +1,34 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
-interface Props { trades: { price: number }[]; }
+interface Props {
+  trades: { price: number; executedAt?: string }[];
+}
 
 const PriceChart: React.FC<Props> = ({ trades }) => {
-  const data = trades.slice(-50).map((t, i) => ({ i, price: t.price }));
+  const data = trades.slice(-50).map((t, i) => ({
+    i,
+    price: t.price,
+    at: t.executedAt ? new Date(t.executedAt).toLocaleTimeString() : `${i}`
+  }));
   if (data.length === 0) return (
-    <div className="bg-umbra-card border border-umbra-border rounded-lg p-4 h-48 flex items-center justify-center text-umbra-muted text-xs">
+    <div className="panel">
       No trade data for chart
     </div>
   );
 
   return (
-    <div className="bg-umbra-card border border-umbra-border rounded-lg p-4">
-      <h3 className="text-umbra-text font-semibold mb-3 text-sm uppercase tracking-wider">Price</h3>
-      <ResponsiveContainer width="100%" height={160}>
+    <div className="panel">
+      <h3>Price Trend</h3>
+      <ResponsiveContainer width="100%" height={210}>
         <LineChart data={data}>
-          <XAxis dataKey="i" hide />
-          <YAxis domain={['auto', 'auto']} tick={{ fill: '#94a3b8', fontSize: 10 }} width={50} />
-          <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #1e293b', borderRadius: 8, fontSize: 12 }}
-            labelStyle={{ display: 'none' }} />
-          <Line type="monotone" dataKey="price" stroke="#7c3aed" strokeWidth={2} dot={false} />
+          <XAxis dataKey="at" minTickGap={30} tick={{ fill: '#63708a', fontSize: 11 }} />
+          <YAxis domain={['auto', 'auto']} tick={{ fill: '#63708a', fontSize: 11 }} width={56} />
+          <Tooltip
+            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #dbe3ef', borderRadius: 8, fontSize: 12 }}
+            formatter={(value: number | string | undefined) => [`${Number(value ?? 0).toFixed(4)}`, 'Price']}
+          />
+          <Line type="monotone" dataKey="price" stroke="#2f6df6" strokeWidth={2.5} dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>

@@ -4,25 +4,40 @@ interface Position { id: string; type: 'supply' | 'borrow'; amount: number; coll
 interface Props { positions: Position[]; }
 
 const MyPositions: React.FC<Props> = ({ positions }) => (
-  <div className="bg-umbra-card border border-umbra-border rounded-lg p-4">
-    <h3 className="text-umbra-text font-semibold mb-3 text-sm uppercase tracking-wider">My Positions</h3>
+  <div className="panel">
+    <h3>My Positions</h3>
     {positions.length === 0 ? (
-      <p className="text-umbra-muted text-xs">No positions</p>
+      <div className="empty-state">No positions yet. Supply or borrow to create positions.</div>
     ) : (
-      <div className="space-y-1">
+      <div className="table-responsive">
+        <table className="table table-modern">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Collateral</th>
+              <th>Health</th>
+            </tr>
+          </thead>
+          <tbody>
         {positions.map(p => (
-          <div key={p.id} className="flex items-center justify-between text-xs py-2 px-2 bg-umbra-bg rounded">
-            <span className={`font-semibold ${p.type === 'supply' ? 'text-umbra-green' : 'text-umbra-purple'}`}>
+          <tr key={p.id}>
+            <td>
+              <span className={`status-chip ${p.type === 'supply' ? 'status-ok' : 'status-warn'}`}>
               {p.type.toUpperCase()}
-            </span>
-            <span className="text-umbra-text font-mono">${p.amount.toLocaleString()}</span>
-            {p.healthFactor !== undefined && (
-              <span className={`font-mono ${p.healthFactor >= 1.5 ? 'text-umbra-green' : p.healthFactor >= 1 ? 'text-yellow-400' : 'text-umbra-red'}`}>
-                HF: {p.healthFactor.toFixed(2)}
               </span>
-            )}
-          </div>
+            </td>
+            <td className="mono">${p.amount.toLocaleString()}</td>
+            <td className="mono">{p.collateral ? `$${p.collateral.toLocaleString()}` : '-'}</td>
+            <td className="mono">
+              {p.healthFactor === undefined
+                ? '-'
+                : p.healthFactor.toFixed(2)}
+            </td>
+          </tr>
         ))}
+          </tbody>
+        </table>
       </div>
     )}
   </div>

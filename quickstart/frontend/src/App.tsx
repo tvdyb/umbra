@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 0BSD
 
 import React from 'react';
-import './App.css';
 import { Routes, Route } from 'react-router-dom';
 import { ToastProvider } from './stores/toastStore';
 import HomeView from './views/HomeView';
@@ -15,9 +14,11 @@ import AppInstallsView from "./views/AppInstallsView.tsx";
 import LicensesView from './views/LicensesView';
 import TradePage from './pages/TradePage';
 import LendPage from './pages/LendPage';
+import DebugLedgerView from './views/DebugLedgerView';
 import { LicenseProvider } from './stores/licenseStore';
 import { AppInstallProvider } from "./stores/appInstallStore.tsx";
 import { TenantRegistrationProvider } from "./stores/tenantRegistrationStore.tsx";
+import UserFetchErrorCard from './components/UserFetchErrorCard';
 
 const App: React.FC = () => {
     const AppProviders = composeProviders(
@@ -31,7 +32,8 @@ const App: React.FC = () => {
     return (
         <AppProviders>
             <Header />
-            <main className="container mt-4">
+            <main className="content-wrap">
+                <UserFetchErrorCard />
                 <Routes>
                     <Route path="/" element={<HomeView />} />
                     <Route path="/tenants" element={<TenantRegistrationView />} />
@@ -40,6 +42,7 @@ const App: React.FC = () => {
                     <Route path="/licenses" element={<LicensesView />} />
                     <Route path="/trade" element={<TradePage />} />
                     <Route path="/lend" element={<LendPage />} />
+                    <Route path="/debug" element={<DebugLedgerView />} />
                 </Routes>
             </main>
             <ToastNotification />
