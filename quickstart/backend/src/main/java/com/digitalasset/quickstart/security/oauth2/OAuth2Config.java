@@ -68,7 +68,7 @@ public class OAuth2Config {
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/user", "/login-links", "/feature-flags", "/oauth2/authorization/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user", "/login-links", "/feature-flags", "/debug/**", "/oauth2/authorization/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/logout").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
