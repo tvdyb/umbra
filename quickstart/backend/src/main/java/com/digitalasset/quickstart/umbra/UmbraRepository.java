@@ -35,12 +35,32 @@ public class UmbraRepository {
      */
     public List<Map<String, Object>> getActiveOrders() {
         String sql = "SELECT contract_id, payload FROM active(?) WHERE payload->>'status' = 'Open'";
-        return jdbc.query(sql, (rs, i) -> {
-            Map<String, Object> row = new HashMap<>();
-            row.put("contractId", rs.getString("contract_id"));
-            row.put("payload", parseJson(rs.getString("payload")));
-            return row;
-        }, SPOT_ORDER_TEMPLATE);
+        try {
+            return jdbc.query(sql, (rs, i) -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("contractId", rs.getString("contract_id"));
+                row.put("payload", parseJson(rs.getString("payload")));
+                return row;
+            }, SPOT_ORDER_TEMPLATE);
+        } catch (Exception e) {
+            logger.debug("SpotOrder template not yet available in PQS", e);
+            return List.of();
+        }
+    }
+
+    public List<Map<String, Object>> getActiveOrdersForTrader(String trader) {
+        String sql = "SELECT contract_id, payload FROM active(?) WHERE payload->>'status' = 'Open' AND payload->>'trader' = ?";
+        try {
+            return jdbc.query(sql, (rs, i) -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("contractId", rs.getString("contract_id"));
+                row.put("payload", parseJson(rs.getString("payload")));
+                return row;
+            }, SPOT_ORDER_TEMPLATE, trader);
+        } catch (Exception e) {
+            logger.debug("SpotOrder template not yet available in PQS", e);
+            return List.of();
+        }
     }
 
     /**
@@ -77,7 +97,12 @@ public class UmbraRepository {
             sells.add(Map.<String, Object>of("price", Double.parseDouble(e.getKey()), "quantity", e.getValue()));
         }
 
-        return Map.<String, Object>of("buys", buys, "sells", sells);
+        return Map.<String, Object>of(
+                "buys", buys,
+                "sells", sells,
+                "bids", buys,
+                "asks", sells
+        );
     }
 
     /**
@@ -85,12 +110,17 @@ public class UmbraRepository {
      */
     public List<Map<String, Object>> getTradesForTrader(String trader) {
         String sql = "SELECT contract_id, payload FROM active(?) WHERE payload->>'buyer' = ? OR payload->>'seller' = ?";
-        return jdbc.query(sql, (rs, i) -> {
-            Map<String, Object> row = new HashMap<>();
-            row.put("contractId", rs.getString("contract_id"));
-            row.put("payload", parseJson(rs.getString("payload")));
-            return row;
-        }, TRADE_CONFIRM_TEMPLATE, trader, trader);
+        try {
+            return jdbc.query(sql, (rs, i) -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("contractId", rs.getString("contract_id"));
+                row.put("payload", parseJson(rs.getString("payload")));
+                return row;
+            }, TRADE_CONFIRM_TEMPLATE, trader, trader);
+        } catch (Exception e) {
+            logger.debug("TradeConfirm template not yet available in PQS", e);
+            return List.of();
+        }
     }
 
     // ── Lending ────────────────────────────────────────────
@@ -100,13 +130,18 @@ public class UmbraRepository {
      */
     public Optional<Map<String, Object>> getLendingPool() {
         String sql = "SELECT contract_id, payload FROM active(?) LIMIT 1";
-        List<Map<String, Object>> results = jdbc.query(sql, (rs, i) -> {
-            Map<String, Object> row = new HashMap<>();
-            row.put("contractId", rs.getString("contract_id"));
-            row.put("payload", parseJson(rs.getString("payload")));
-            return row;
-        }, LENDING_POOL_TEMPLATE);
-        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        try {
+            List<Map<String, Object>> results = jdbc.query(sql, (rs, i) -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("contractId", rs.getString("contract_id"));
+                row.put("payload", parseJson(rs.getString("payload")));
+                return row;
+            }, LENDING_POOL_TEMPLATE);
+            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        } catch (Exception e) {
+            logger.debug("LendingPool template not yet available in PQS", e);
+            return Optional.empty();
+        }
     }
 
     /**
@@ -114,12 +149,17 @@ public class UmbraRepository {
      */
     public List<Map<String, Object>> getSupplyPositions(String trader) {
         String sql = "SELECT contract_id, payload FROM active(?) WHERE payload->>'supplier' = ?";
-        return jdbc.query(sql, (rs, i) -> {
-            Map<String, Object> row = new HashMap<>();
-            row.put("contractId", rs.getString("contract_id"));
-            row.put("payload", parseJson(rs.getString("payload")));
-            return row;
-        }, SUPPLY_POSITION_TEMPLATE, trader);
+        try {
+            return jdbc.query(sql, (rs, i) -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("contractId", rs.getString("contract_id"));
+                row.put("payload", parseJson(rs.getString("payload")));
+                return row;
+            }, SUPPLY_POSITION_TEMPLATE, trader);
+        } catch (Exception e) {
+            logger.debug("SupplyPosition template not yet available in PQS", e);
+            return List.of();
+        }
     }
 
     /**
@@ -127,12 +167,17 @@ public class UmbraRepository {
      */
     public List<Map<String, Object>> getBorrowPositions(String trader) {
         String sql = "SELECT contract_id, payload FROM active(?) WHERE payload->>'borrower' = ?";
-        return jdbc.query(sql, (rs, i) -> {
-            Map<String, Object> row = new HashMap<>();
-            row.put("contractId", rs.getString("contract_id"));
-            row.put("payload", parseJson(rs.getString("payload")));
-            return row;
-        }, BORROW_POSITION_TEMPLATE, trader);
+        try {
+            return jdbc.query(sql, (rs, i) -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("contractId", rs.getString("contract_id"));
+                row.put("payload", parseJson(rs.getString("payload")));
+                return row;
+            }, BORROW_POSITION_TEMPLATE, trader);
+        } catch (Exception e) {
+            logger.debug("BorrowPosition template not yet available in PQS", e);
+            return List.of();
+        }
     }
 
     /**
@@ -140,12 +185,17 @@ public class UmbraRepository {
      */
     public List<Map<String, Object>> getAllBorrowPositions() {
         String sql = "SELECT contract_id, payload FROM active(?)";
-        return jdbc.query(sql, (rs, i) -> {
-            Map<String, Object> row = new HashMap<>();
-            row.put("contractId", rs.getString("contract_id"));
-            row.put("payload", parseJson(rs.getString("payload")));
-            return row;
-        }, BORROW_POSITION_TEMPLATE);
+        try {
+            return jdbc.query(sql, (rs, i) -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("contractId", rs.getString("contract_id"));
+                row.put("payload", parseJson(rs.getString("payload")));
+                return row;
+            }, BORROW_POSITION_TEMPLATE);
+        } catch (Exception e) {
+            logger.debug("BorrowPosition template not yet available in PQS", e);
+            return List.of();
+        }
     }
 
     // ── Oracle ─────────────────────────────────────────────
@@ -155,13 +205,18 @@ public class UmbraRepository {
      */
     public Optional<Map<String, Object>> getOraclePrice(String asset) {
         String sql = "SELECT contract_id, payload FROM active(?) WHERE payload->>'asset' = ?";
-        List<Map<String, Object>> results = jdbc.query(sql, (rs, i) -> {
-            Map<String, Object> row = new HashMap<>();
-            row.put("contractId", rs.getString("contract_id"));
-            row.put("payload", parseJson(rs.getString("payload")));
-            return row;
-        }, ORACLE_PRICE_TEMPLATE, asset);
-        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        try {
+            List<Map<String, Object>> results = jdbc.query(sql, (rs, i) -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("contractId", rs.getString("contract_id"));
+                row.put("payload", parseJson(rs.getString("payload")));
+                return row;
+            }, ORACLE_PRICE_TEMPLATE, asset);
+            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        } catch (Exception e) {
+            logger.debug("OraclePrice template not yet available in PQS", e);
+            return Optional.empty();
+        }
     }
 
     /**
@@ -169,12 +224,17 @@ public class UmbraRepository {
      */
     public List<Map<String, Object>> getAllOraclePrices() {
         String sql = "SELECT contract_id, payload FROM active(?)";
-        return jdbc.query(sql, (rs, i) -> {
-            Map<String, Object> row = new HashMap<>();
-            row.put("contractId", rs.getString("contract_id"));
-            row.put("payload", parseJson(rs.getString("payload")));
-            return row;
-        }, ORACLE_PRICE_TEMPLATE);
+        try {
+            return jdbc.query(sql, (rs, i) -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("contractId", rs.getString("contract_id"));
+                row.put("payload", parseJson(rs.getString("payload")));
+                return row;
+            }, ORACLE_PRICE_TEMPLATE);
+        } catch (Exception e) {
+            logger.debug("OraclePrice template not yet available in PQS", e);
+            return List.of();
+        }
     }
 
     // ── DarkPoolOperator ───────────────────────────────────
@@ -184,13 +244,18 @@ public class UmbraRepository {
      */
     public Optional<Map<String, Object>> getDarkPoolOperator() {
         String sql = "SELECT contract_id, payload FROM active(?) LIMIT 1";
-        List<Map<String, Object>> results = jdbc.query(sql, (rs, i) -> {
-            Map<String, Object> row = new HashMap<>();
-            row.put("contractId", rs.getString("contract_id"));
-            row.put("payload", parseJson(rs.getString("payload")));
-            return row;
-        }, DARK_POOL_OPERATOR_TEMPLATE);
-        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        try {
+            List<Map<String, Object>> results = jdbc.query(sql, (rs, i) -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("contractId", rs.getString("contract_id"));
+                row.put("payload", parseJson(rs.getString("payload")));
+                return row;
+            }, DARK_POOL_OPERATOR_TEMPLATE);
+            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        } catch (Exception e) {
+            logger.debug("DarkPoolOperator template not yet available in PQS", e);
+            return Optional.empty();
+        }
     }
 
     @SuppressWarnings("unchecked")
