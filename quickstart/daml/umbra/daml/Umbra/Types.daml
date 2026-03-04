@@ -1,42 +1,45 @@
 module Umbra.Types where
 
--- Asset identifiers
-data Asset = CC | USDCx
-  deriving (Eq, Show, Ord)
+-- | Asset identifier (e.g., "BTC", "ETH", "USDC", "CC")
+type Asset = Text
 
--- Order side for dark pool
+-- | Order side
 data Side = Buy | Sell
   deriving (Eq, Show, Ord)
 
 -- Order status
-data OrderStatus = Open | Filled | Cancelled | PartiallyFilled
-  deriving (Eq, Show, Ord)
-
--- Price as a decimal (CC per USDCx)
-type Price = Decimal
-
--- Quantity as a decimal
-type Quantity = Decimal
-
--- Unique order identifier
-type OrderId = Text
-
--- Unique position identifier
-type PositionId = Text
-
--- Interest rate model parameters
-data RateModelParams = RateModelParams
-  with
-    baseRate : Decimal
-    multiplierPerUtil : Decimal
-    kinkUtilization : Decimal
-    jumpMultiplier : Decimal
+data OrderStatus = Open | Filled | Cancelled
   deriving (Eq, Show)
 
--- Default rate model (similar to Aave's)
-defaultRateModel : RateModelParams
-defaultRateModel = RateModelParams with
-  baseRate = 0.02
-  multiplierPerUtil = 0.10
-  kinkUtilization = 0.80
-  jumpMultiplier = 0.75
+-- | Price as Decimal
+type Price = Decimal
+
+-- | Quantity as Decimal
+type Quantity = Decimal
+
+-- | Rate model parameters (kink-based, similar to Aave/Compound)
+data RateModelParams = RateModelParams
+  with
+    baseRate : Decimal        -- Base borrow rate (e.g., 0.02 = 2%)
+    multiplier : Decimal      -- Rate slope below kink
+    jumpMultiplier : Decimal  -- Rate slope above kink
+    kink : Decimal            -- Utilization kink point (e.g., 0.80 = 80%)
+  deriving (Eq, Show)
+
+-- | Collateral configuration
+data CollateralConfig = CollateralConfig
+  with
+    asset : Asset
+    ltvRatio : Decimal              -- Loan-to-value ratio (e.g., 0.55 = 55%)
+    liquidationThreshold : Decimal  -- Liquidation threshold (e.g., 0.65 = 65%)
+    liquidationBonus : Decimal      -- Bonus for liquidators (e.g., 0.05 = 5%)
+  deriving (Eq, Show)
+
+-- | Default CC collateral config
+defaultCCCollateral : CollateralConfig
+defaultCCCollateral = CollateralConfig
+  with
+    asset = "CC"
+    ltvRatio = 0.55
+    liquidationThreshold = 0.65
+    liquidationBonus = 0.05
