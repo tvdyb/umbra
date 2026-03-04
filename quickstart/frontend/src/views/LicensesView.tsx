@@ -99,9 +99,18 @@ const LicensesView: React.FC = () => {
 
 
   return (
-    <div>
-      <h2>Licenses</h2>
-      <table className="table table-fixed" id="licenses-table">
+    <section className="page-section">
+      <div className="page-head">
+        <h1 className="page-title">Licenses</h1>
+        <p className="page-subtitle">
+          Track license health, renewals, and archival actions. Deadlines and statuses are highlighted below.
+        </p>
+      </div>
+      {licenses.length === 0 ? (
+        <div className="empty-state">No licenses found for this party yet.</div>
+      ) : (
+      <div className="table-responsive">
+      <table className="table table-modern table-fixed" id="licenses-table">
         <thead>
           <tr>
             <th style={{ width: '220px' }}>License Contract ID</th>
@@ -155,6 +164,8 @@ const LicensesView: React.FC = () => {
           })}
         </tbody>
       </table>
+      </div>
+      )}
 
       <LicenseRenewalRequestModal
         show={showRenewalModal && !!selectedLicense}
@@ -174,7 +185,7 @@ const LicensesView: React.FC = () => {
         onClose={closeArchiveModal}
         onArchive={handleArchive}
       />
-    </div>
+    </section>
   );
 };
 

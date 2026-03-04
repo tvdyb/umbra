@@ -27,13 +27,23 @@ const AppInstallsView: React.FC = () => {
   }, [fetchUser, fetchAll]);
 
   return (
-    <div>
-      <h2>App Installs</h2>
-      <div className="alert alert-info" role="alert">
-        <strong>Note:</strong> Run <code>make create-app-install-request</code> to submit an AppInstallRequest
+    <section className="page-section">
+      <div className="page-head">
+        <h1 className="page-title">App Installs</h1>
+        <p className="page-subtitle">
+          Approve installation requests, create licenses, and monitor install lifecycle by contract.
+        </p>
       </div>
-      <div className="mt-4">
-        <table className="table table-fixed" id="app-installs-table">
+      <div className="panel mb-3">
+        <strong>Tip:</strong> Run <code>make create-app-install-request</code> to submit a new AppInstallRequest.
+      </div>
+      {unifiedInstalls.length === 0 ? (
+        <div className="empty-state">
+          No app installs yet. Submit an install request and refresh this page.
+        </div>
+      ) : (
+      <div className="table-responsive">
+        <table className="table table-modern table-fixed" id="app-installs-table">
           <thead>
             <tr>
               <th style={{ width: '150px' }}>Contract ID</th>
@@ -111,7 +121,8 @@ const AppInstallsView: React.FC = () => {
           </tbody>
         </table>
       </div>
-    </div>
+      )}
+    </section>
   );
 };
 

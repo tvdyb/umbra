@@ -147,3 +147,24 @@ Local is considered green when all are true:
 - `.env.local`
 - `docker/backend-service/...`
 - `daml/licensing/.daml/dist/*.dar`
+
+---
+
+## 10) Debug / Ledger smoke-check
+
+Once the stack is up, verify backend diagnostics:
+
+```bash
+cd ~/projects/umbra/quickstart
+./scripts/smoke-debug-ledger.sh http://localhost:8080
+```
+
+Or through the frontend proxy:
+
+```bash
+./scripts/smoke-debug-ledger.sh http://app-provider.localhost:3000/api
+```
+
+Also verify the in-app page:
+
+- `http://app-provider.localhost:3000/debug`

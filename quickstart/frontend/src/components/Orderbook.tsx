@@ -4,36 +4,41 @@ interface Level { price: number; quantity: number; }
 interface Props { bids: Level[]; asks: Level[]; }
 
 const Orderbook: React.FC<Props> = ({ bids, asks }) => {
-  const maxQty = Math.max(...[...bids, ...asks].map(l => l.quantity), 1);
+  const maxQty = Math.max(...[...bids, ...asks].map((l) => l.quantity), 1);
   return (
-    <div className="bg-umbra-card border border-umbra-border rounded-lg p-4">
-      <h3 className="text-umbra-text font-semibold mb-3 text-sm uppercase tracking-wider">Orderbook</h3>
-      <div className="grid grid-cols-2 gap-2 text-xs text-umbra-muted mb-1">
-        <div className="grid grid-cols-2"><span>Price</span><span className="text-right">Qty</span></div>
-        <div className="grid grid-cols-2"><span>Price</span><span className="text-right">Qty</span></div>
+    <div className="panel">
+      <h3>Orderbook</h3>
+      <div className="page-subtitle mb-2">Live aggregated levels. Green = bids, red = asks.</div>
+      {bids.length === 0 && asks.length === 0 ? (
+        <div className="empty-state">No orders yet. Place the first order to populate depth.</div>
+      ) : (
+      <>
+      <div className="umbra-orderbook-head">
+        <div><span>Bid Price</span><span>Qty</span></div>
+        <div><span>Ask Price</span><span>Qty</span></div>
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        {/* Bids */}
-        <div className="space-y-0.5">
+      <div className="umbra-orderbook-grid">
+        <div className="umbra-orderbook-side">
           {bids.slice(0, 12).map((l, i) => (
-            <div key={i} className="relative grid grid-cols-2 text-xs py-0.5 px-1">
-              <div className="absolute inset-0 bg-umbra-green/10 rounded" style={{ width: `${(l.quantity / maxQty) * 100}%` }} />
-              <span className="relative text-umbra-green font-mono">{l.price.toFixed(2)}</span>
-              <span className="relative text-right text-umbra-text font-mono">{l.quantity.toFixed(2)}</span>
+            <div key={`bid-${i}`} className="umbra-level-row">
+              <div className="umbra-level-bar bid" style={{ width: `${(l.quantity / maxQty) * 100}%` }} />
+              <span className="mono text-success">{l.price.toFixed(4)}</span>
+              <span className="mono text-end">{l.quantity.toFixed(2)}</span>
             </div>
           ))}
         </div>
-        {/* Asks */}
-        <div className="space-y-0.5">
+        <div className="umbra-orderbook-side">
           {asks.slice(0, 12).map((l, i) => (
-            <div key={i} className="relative grid grid-cols-2 text-xs py-0.5 px-1">
-              <div className="absolute inset-0 bg-umbra-red/10 rounded" style={{ width: `${(l.quantity / maxQty) * 100}%` }} />
-              <span className="relative text-umbra-red font-mono">{l.price.toFixed(2)}</span>
-              <span className="relative text-right text-umbra-text font-mono">{l.quantity.toFixed(2)}</span>
+            <div key={`ask-${i}`} className="umbra-level-row">
+              <div className="umbra-level-bar ask" style={{ width: `${(l.quantity / maxQty) * 100}%` }} />
+              <span className="mono text-danger">{l.price.toFixed(4)}</span>
+              <span className="mono text-end">{l.quantity.toFixed(2)}</span>
             </div>
           ))}
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };

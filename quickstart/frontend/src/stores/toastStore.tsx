@@ -3,11 +3,21 @@
 
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react'
 
+type ToastType = 'error' | 'success' | 'info' | 'warning';
+
+interface ToastState {
+    type: ToastType;
+    title: string;
+    message: string;
+}
+
 interface ToastContextType {
-    message: string
+    toast: ToastState | null
     show: boolean
     displayError: (message: string) => void
     displaySuccess: (message: string) => void
+    displayInfo: (message: string) => void
+    displayWarning: (message: string) => void
     hideError: () => void
 }
 
@@ -18,12 +28,12 @@ interface ToastProviderProps {
 const ToastContext = createContext<ToastContextType | undefined>(undefined)
 
 export const ToastProvider = ({ children }: ToastProviderProps) => {
-    const [message, setMessage] = useState('')
+    const [toast, setToast] = useState<ToastState | null>(null)
     const [show, setShow] = useState(false)
     const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const hideError = useCallback(() => {
-        setMessage('')
+        setToast(null)
         setShow(false)
         if (timeoutIdRef.current !== null) {
             clearTimeout(timeoutIdRef.current)
@@ -33,7 +43,7 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
 
     const displayError = useCallback(
         (msg: string) => {
-            setMessage(`Error: ${msg}`)
+            setToast({ type: 'error', title: 'Error', message: msg })
             setShow(true)
             if (timeoutIdRef.current !== null) {
                 clearTimeout(timeoutIdRef.current)
@@ -47,20 +57,48 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
 
     const displaySuccess = useCallback(
         (msg: string) => {
-            setMessage(`Success: ${msg}`)
+            setToast({ type: 'success', title: 'Success', message: msg })
             setShow(true)
             if (timeoutIdRef.current !== null) {
                 clearTimeout(timeoutIdRef.current)
             }
             timeoutIdRef.current = setTimeout(() => {
                 hideError()
-            }, 5000) // Success messages could auto-hide faster
+            }, 5000)
+        },
+        [hideError]
+    )
+
+    const displayInfo = useCallback(
+        (msg: string) => {
+            setToast({ type: 'info', title: 'Info', message: msg })
+            setShow(true)
+            if (timeoutIdRef.current !== null) {
+                clearTimeout(timeoutIdRef.current)
+            }
+            timeoutIdRef.current = setTimeout(() => {
+                hideError()
+            }, 6000)
+        },
+        [hideError]
+    )
+
+    const displayWarning = useCallback(
+        (msg: string) => {
+            setToast({ type: 'warning', title: 'Warning', message: msg })
+            setShow(true)
+            if (timeoutIdRef.current !== null) {
+                clearTimeout(timeoutIdRef.current)
+            }
+            timeoutIdRef.current = setTimeout(() => {
+                hideError()
+            }, 8000)
         },
         [hideError]
     )
 
     return (
-        <ToastContext.Provider value={{ message, show, displayError, displaySuccess, hideError }}>
+        <ToastContext.Provider value={{ toast, show, displayError, displaySuccess, displayInfo, displayWarning, hideError }}>
             {children}
         </ToastContext.Provider>
     )

@@ -85,11 +85,60 @@ If you need assistance, please follow these directions to gather the log informa
 5. `make start`             # start the system with logging enabled
 6. `tar -czvf <your file name with .tar.gz>` logs  # gather the content of the `logs` directory into a file
 
+## Verify DAML/Canton Backend Health
+
+Use this quick checklist when UI pages show issues like "Error fetching user", missing contracts, or "Not Found".
+
+### 1) Confirm core services
+
+```bash
+cd quickstart
+make status
+```
+
+Expected: `backend-service`, `pqs-app-provider`, `canton`, and `splice` are running.
+
+### 2) Check backend + diagnostics endpoint
+
+```bash
+curl -sS http://localhost:8080/debug/ledger | jq '.health,.identity,.ledger.packageCount'
+```
+
+If you access via frontend proxy/ingress, use:
+
+```bash
+curl -sS http://app-provider.localhost:3000/api/debug/ledger | jq '.health'
+```
+
+### 3) Use the in-app Debug tab
+
+Open:
+
+- `http://app-provider.localhost:3000/debug`
+
+Review:
+
+- Who am I (tenant/party/roles)
+- Backend/Postgres/Ledger health and latency
+- Loaded package IDs
+- Template list + active contract counts
+- Sample contracts and recent events
+
+Use **Copy Diagnostics JSON** and attach it to bug reports.
+
+### 4) Quick backend checklist
+
+- [ ] DAML packages loaded (non-zero package count)
+- [ ] Expected templates visible (Licensing + Umbra)
+- [ ] Active contracts exist for expected templates
+- [ ] Authenticated party is present
+- [ ] Ledger health is `OK`
+
 
 ## Available make targets
 
 Run `make help` to see a list of all available targets.
-Read the [FAQ Make target reference](9https://docs.digitalasset.com/build/3.3/quickstart/troubleshoot/cnqs-faq.html#cn-app-quickstart-make-target-reference) for a detailed list of make targets and their descriptions.
+Read the [FAQ Make target reference](https://docs.digitalasset.com/build/3.3/quickstart/troubleshoot/cnqs-faq.html#cn-app-quickstart-make-target-reference) for a detailed list of make targets and their descriptions.
 
 ## Topology
 

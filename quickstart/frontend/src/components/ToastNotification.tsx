@@ -5,37 +5,27 @@ import React from 'react';
 import { useToast } from '../stores/toastStore';
 
 const ToastNotification: React.FC = () => {
-    const { message, show, hideError } = useToast();
+    const { toast, show, hideError } = useToast();
 
-    const isError = message.startsWith("Error:");
-    const isSuccess = message.startsWith("Success:");
+    if (!show || !toast) return null;
 
-    const bgClass = isError ? 'bg-danger' : isSuccess ? 'bg-success' : 'bg-info';
-    const textColor = 'text-white'; // Adjust as desired
-    const headerText = isError ? 'Error' : isSuccess ? 'Success' : 'Info';
+    const classByType: Record<string, string> = {
+        error: 'toast-panel toast-error',
+        success: 'toast-panel toast-success',
+        info: 'toast-panel toast-info',
+        warning: 'toast-panel toast-warning',
+    };
 
     return (
-        <div
-            className="position-fixed mt3 start-50 translate-middle-x"
-            style={{ zIndex: 2000, top: "3rem" }}
-        >
-            <div
-                id="liveToast"
-                className={`toast ${bgClass} ${textColor} ${show ? 'show' : ''}`}
-                role="alert"
-                aria-live="assertive"
-                aria-atomic="true"
-            >
-                <div className="toast-header">
-                    <strong className="me-auto">{headerText}</strong>
-                    <button
-                        type="button"
-                        className="btn-close"
-                        onClick={hideError}
-                        aria-label="Close"
-                    ></button>
+        <div className="toast-wrap" role="status" aria-live="polite" aria-atomic="true">
+            <div className={classByType[toast.type]}>
+                <div className="toast-title-row">
+                    <strong>{toast.title}</strong>
+                    <button type="button" className="toast-close" onClick={hideError} aria-label="Close">
+                        ×
+                    </button>
                 </div>
-                <div className="toast-body">{message}</div>
+                <div className="toast-message">{toast.message}</div>
             </div>
         </div>
     );

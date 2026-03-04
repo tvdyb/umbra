@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useUserStore } from '../stores/userStore';
-import { getOrderbook, getTrades } from '../services/umbraApi';
+import { getOrderbook, getTrades, getMyOrders } from '../services/umbraApi';
 import Orderbook from '../components/Orderbook';
 import OrderEntry from '../components/OrderEntry';
 import MyOrders from '../components/MyOrders';
 import RecentTrades from '../components/RecentTrades';
 import PriceChart from '../components/PriceChart';
+import { useToast } from '../stores/toastStore';
+import { Link } from 'react-router-dom';
 
 const TradePage: React.FC = () => {
+  const toast = useToast();
   const { user } = useUserStore();
-  const trader = user?.name || '';
+  const trader = user?.party || user?.name || '';
   const [orderbook, setOrderbook] = useState<any>({ bids: [], asks: [] });
   const [myOrders, setMyOrders] = useState<any[]>([]);
   const [trades, setTrades] = useState<any[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
 
   const refresh = useCallback(() => setTick(t => t + 1), []);
@@ -21,42 +25,94 @@ const TradePage: React.FC = () => {
     const load = async () => {
       try {
         const ob = await getOrderbook();
-        setOrderbook(ob);
-        // Filter user's orders from orderbook if available
-        if (ob.orders) setMyOrders(ob.orders.filter((o: any) => o.trader === trader));
-        else if (ob.myOrders) setMyOrders(ob.myOrders);
-      } catch (e) { console.error(e); }
+        setOrderbook({
+          bids: ob.bids || ob.buys || [],
+          asks: ob.asks || ob.sells || [],
+        });
+      } catch (e: any) {
+        console.error(e);
+        const msg = e?.response?.data?.error || e?.message || 'Failed to load orderbook';
+        setLoadError(msg);
+      }
+
+      try {
+        const mine = await getMyOrders();
+        setMyOrders(Array.isArray(mine) ? mine : []);
+      } catch (e: any) {
+        console.error(e);
+        const msg = e?.response?.data?.error || e?.message || 'Failed to load orders';
+        setLoadError(msg);
+      }
+
       if (trader) {
-        try { setTrades(await getTrades(trader)); } catch (e) { console.error(e); }
+        try {
+          setTrades(await getTrades(trader));
+        } catch (e: any) {
+          console.error(e);
+          const msg = e?.response?.data?.error || e?.message || 'Failed to load trades';
+          setLoadError(msg);
+        }
       }
     };
-    load();
+    void load();
     const iv = setInterval(load, 2500);
     return () => clearInterval(iv);
   }, [trader, tick]);
 
-  if (!user) return <div className="text-umbra-muted p-8">Please log in to trade.</div>;
+  useEffect(() => {
+    if (loadError) {
+      toast.displayWarning(`Trade page: ${loadError}`);
+    }
+  }, [loadError, toast]);
+
+  if (!user) {
+    return (
+      <section className="page-section">
+        <h1 className="page-title">Umbra Dark Pool</h1>
+        <p className="page-subtitle">
+          Please log in to trade. If login fails, open <Link to="/debug">Debug / Ledger</Link>.
+        </p>
+      </section>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-umbra-bg p-4">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-umbra-text mb-1">
-          <span className="text-umbra-purple">Umbra</span> Dark Pool
-        </h1>
-        <p className="text-umbra-muted text-sm mb-6">Private orderbook trading on Canton Network</p>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 space-y-4">
-            <PriceChart trades={trades} />
-            <Orderbook bids={orderbook.bids || []} asks={orderbook.asks || []} />
+    <section className="page-section">
+      <div className="page-head">
+        <h1 className="page-title">Umbra Dark Pool</h1>
+        <p className="page-subtitle">Private orderbook trading on Canton Network</p>
+      </div>
+      {loadError && (
+        <div className="diagnostic-alert mb-3">
+          <div className="diagnostic-alert-head">
+            <h3 className="diagnostic-alert-title">Data Loading Warning</h3>
+            <span className="status-chip status-warn">Degraded</span>
           </div>
-          <div className="space-y-4">
+          <p className="diagnostic-alert-body">{loadError}</p>
+          <div className="action-row">
+            <button className="btn btn-sm btn-primary" onClick={refresh}>Retry</button>
+            <Link to="/debug" className="btn btn-sm btn-outline-primary">Open Debug</Link>
+          </div>
+        </div>
+      )}
+      <div className="debug-grid">
+          <div className="debug-col-8">
+            <PriceChart trades={trades} />
+            <div className="mt-3">
+              <Orderbook bids={orderbook.bids || []} asks={orderbook.asks || []} />
+            </div>
+          </div>
+          <div className="debug-col-4">
             <OrderEntry trader={trader} onPlaced={refresh} />
-            <MyOrders orders={myOrders} onCancelled={refresh} />
+            <div className="mt-3">
+              <MyOrders orders={myOrders} onCancelled={refresh} />
+            </div>
+          </div>
+          <div className="debug-col-12">
             <RecentTrades trades={trades} />
           </div>
         </div>
-      </div>
-    </div>
+    </section>
   );
 };
 

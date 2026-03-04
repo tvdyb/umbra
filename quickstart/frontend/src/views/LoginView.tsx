@@ -38,25 +38,33 @@ const LoginView: React.FC = () => {
 
     return (
         featureFlags?.authMode === 'oauth2' ? (
-            <div className="container">
-                <h2>Login with OAuth 2.0</h2>
-                <table className="table table-striped">
+            <section className="page-section">
+                <div className="page-head">
+                    <h1 className="page-title">Sign In</h1>
+                    <p className="page-subtitle">Choose your OAuth identity provider account.</p>
+                </div>
+                <table className="table table-modern">
                     <tbody>
                         {loginLinks.map((link) => (
                             <tr key={link.url}>
                                 <td>
-                                    <a className="btn btn-link" href={link.url}>{link.name}</a>
+                                    <a className="btn btn-primary btn-sm" href={link.url}>{link.name}</a>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-                <div>AppProvider user: app-provider, password: abc123</div>
-                <div>AppUser user: app-user, password: abc123</div>
-            </div>
+                <div className="panel mt-3">
+                    <div>AppProvider user: <code>app-provider</code>, password: <code>abc123</code></div>
+                    <div>AppUser user: <code>app-user</code>, password: <code>abc123</code></div>
+                </div>
+            </section>
         ) : (
-            <div className="login-container">
-                <h1 className="login-title">Login</h1>
+            <section className="page-section">
+                <div className="page-head">
+                    <h1 className="page-title">Login</h1>
+                    <p className="page-subtitle">Shared-secret mode</p>
+                </div>
                 <form name="f" action="login/shared-secret" method="POST" className="login-form">
                     <div className="form-group">
                         <label htmlFor="username" className="form-label">User:</label>
@@ -64,9 +72,11 @@ const LoginView: React.FC = () => {
                         <button type="submit" name="submit" className="form-button">Sign in</button>
                     </div>
                 </form>
-                <div>AppProvider user: app-provider</div>
-                <div>AppUser user: app-user</div>
-            </div>
+                <div className="panel mt-3">
+                    <div>AppProvider user: <code>app-provider</code></div>
+                    <div>AppUser user: <code>app-user</code></div>
+                </div>
+            </section>
 
         )
     );

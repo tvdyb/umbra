@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { borrow } from '../services/umbraApi';
+import { useToast } from '../stores/toastStore';
 
 interface Props { trader: string; ccPrice: number; onAction: () => void; }
 
 const BorrowSection: React.FC<Props> = ({ trader, ccPrice, onAction }) => {
+  const toast = useToast();
   const [collateral, setCollateral] = useState('');
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,32 +16,56 @@ const BorrowSection: React.FC<Props> = ({ trader, ccPrice, onAction }) => {
   const healthFactor = borrowVal > 0 ? (collateralVal * ccPrice) / (borrowVal * 1.5) : Infinity;
 
   const doBorrow = async () => {
-    if (!collateral || !amount) return;
+    if (!trader) {
+      toast.displayError('No authenticated party found.');
+      return;
+    }
+    if (!collateral || !amount) {
+      toast.displayWarning('Collateral and borrow amount are required.');
+      return;
+    }
     setLoading(true);
-    try { await borrow({ trader, collateral: collateralVal, amount: borrowVal }); setCollateral(''); setAmount(''); onAction(); }
-    catch (e) { console.error(e); }
+    try {
+      await borrow({
+        borrower: trader,
+        collateralAmount: collateralVal,
+        borrowAmount: borrowVal,
+      });
+      setCollateral('');
+      setAmount('');
+      onAction();
+      toast.displaySuccess('Borrow submitted.');
+    }
+    catch (e: any) {
+      console.error(e);
+      const message = e?.response?.data?.error || e?.response?.data?.message || e?.message || 'Borrow failed';
+      toast.displayError(message);
+    }
     setLoading(false);
   };
 
   return (
-    <div className="bg-umbra-card border border-umbra-border rounded-lg p-4">
-      <h3 className="text-umbra-text font-semibold mb-3 text-sm uppercase tracking-wider">Borrow USDCx</h3>
-      <input type="number" placeholder="CC Collateral" value={collateral} onChange={e => setCollateral(e.target.value)}
-        className="w-full mb-2 px-3 py-2 bg-umbra-bg border border-umbra-border rounded text-umbra-text text-sm focus:border-umbra-purple focus:outline-none" />
-      <input type="number" placeholder="USDCx Amount" value={amount} onChange={e => setAmount(e.target.value)}
-        className="w-full mb-2 px-3 py-2 bg-umbra-bg border border-umbra-border rounded text-umbra-text text-sm focus:border-umbra-purple focus:outline-none" />
-      <div className="flex justify-between text-xs text-umbra-muted mb-1">
-        <span>Max borrowable</span><span className="font-mono">${maxBorrow.toFixed(2)}</span>
+    <div className="panel">
+      <h3>Borrow USDCx</h3>
+      <div className="mb-2">
+        <label className="form-label">CC Collateral</label>
+        <input type="number" placeholder="0.00" value={collateral} onChange={e => setCollateral(e.target.value)} className="form-control" />
       </div>
-      <div className="flex justify-between text-xs mb-3">
-        <span className="text-umbra-muted">Health Factor</span>
-        <span className={`font-mono font-semibold ${healthFactor >= 1.5 ? 'text-umbra-green' : healthFactor >= 1 ? 'text-yellow-400' : 'text-umbra-red'}`}>
+      <div className="mb-2">
+        <label className="form-label">USDCx Amount</label>
+        <input type="number" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} className="form-control" />
+      </div>
+      <div className="d-flex justify-content-between small text-muted mb-1">
+        <span>Max borrowable</span><span className="mono">${maxBorrow.toFixed(2)}</span>
+      </div>
+      <div className="d-flex justify-content-between small mb-3">
+        <span className="text-muted">Health Factor</span>
+        <span className={`mono fw-semibold ${healthFactor >= 1.5 ? 'text-success' : healthFactor >= 1 ? 'text-warning' : 'text-danger'}`}>
           {healthFactor === Infinity ? '∞' : healthFactor.toFixed(2)}
         </span>
       </div>
-      <button onClick={doBorrow} disabled={loading}
-        className="w-full py-2 bg-umbra-purple hover:bg-umbra-purple/80 text-white rounded text-sm font-semibold disabled:opacity-50">
-        {loading ? '...' : 'Borrow'}
+      <button onClick={doBorrow} disabled={loading} className="btn btn-primary w-100">
+        {loading ? 'Submitting...' : 'Borrow'}
       </button>
     </div>
   );

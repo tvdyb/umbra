@@ -21,29 +21,29 @@ const OrderEntry: React.FC<Props> = ({ trader, onPlaced }) => {
   };
 
   return (
-    <div className="bg-umbra-card border border-umbra-border rounded-lg p-4">
-      <h3 className="text-umbra-text font-semibold mb-3 text-sm uppercase tracking-wider">Place Order</h3>
-      <div className="flex gap-2 mb-3">
+    <div className="panel">
+      <h3>Place Order</h3>
+      <div className="d-flex gap-2 mb-3">
         {(['buy', 'sell'] as const).map(s => (
-          <button key={s} onClick={() => setSide(s)}
-            className={`flex-1 py-2 rounded text-sm font-semibold transition-colors ${
+          <button key={s} onClick={() => setSide(s)} className={`btn flex-fill ${
               side === s
-                ? s === 'buy' ? 'bg-umbra-green text-white' : 'bg-umbra-red text-white'
-                : 'bg-umbra-border text-umbra-muted hover:text-umbra-text'
+                ? s === 'buy' ? 'btn-success' : 'btn-danger'
+                : 'btn-outline-secondary'
             }`}>
             {s.toUpperCase()}
           </button>
         ))}
       </div>
-      <input type="number" placeholder="Price" value={price} onChange={e => setPrice(e.target.value)}
-        className="w-full mb-2 px-3 py-2 bg-umbra-bg border border-umbra-border rounded text-umbra-text text-sm focus:border-umbra-purple focus:outline-none" />
-      <input type="number" placeholder="Quantity" value={quantity} onChange={e => setQuantity(e.target.value)}
-        className="w-full mb-3 px-3 py-2 bg-umbra-bg border border-umbra-border rounded text-umbra-text text-sm focus:border-umbra-purple focus:outline-none" />
-      <button onClick={submit} disabled={loading}
-        className={`w-full py-2 rounded font-semibold text-sm transition-colors ${
-          side === 'buy' ? 'bg-umbra-green hover:bg-umbra-green/80' : 'bg-umbra-red hover:bg-umbra-red/80'
-        } text-white disabled:opacity-50`}>
-        {loading ? '...' : `${side.toUpperCase()} CC`}
+      <div className="mb-2">
+        <label className="form-label">Price</label>
+        <input type="number" placeholder="0.0000" value={price} onChange={e => setPrice(e.target.value)} className="form-control" />
+      </div>
+      <div className="mb-3">
+        <label className="form-label">Quantity</label>
+        <input type="number" placeholder="0.00" value={quantity} onChange={e => setQuantity(e.target.value)} className="form-control" />
+      </div>
+      <button onClick={submit} disabled={loading} className={`btn w-100 ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
+        {loading ? 'Submitting...' : `${side.toUpperCase()} CC`}
       </button>
     </div>
   );
